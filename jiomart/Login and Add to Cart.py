@@ -1,4 +1,4 @@
-import requests, time, sys
+import requests, time, sys, json
 
 
 class JioMart:
@@ -8,6 +8,22 @@ class JioMart:
             "User-Agent": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
         }
         self.cart_id = None
+
+    def fetch_cookies(self):
+        with open("cookies.txt", "r") as file:
+            data_dict = json.load(file)
+        cookies = {}
+        for cookie in data_dict:
+            cookies[cookie["name"]] = cookie["value"]
+        self.cookies = cookies
+
+    def fetch_headers(self):
+        with open("local_storage.txt", "r") as file:
+            data_dict = json.load(file)
+        headers = {}
+        headers["Authtoken"] = data_dict["authtoken"]
+        headers["Userid"] = data_dict["userid"]
+        self.add_request_headers(headers)
 
     def get_timestamp(self):
         return str(int(time.time()) * 1000)
@@ -19,7 +35,7 @@ class JioMart:
         self.request_headers.update(headers)
 
     def create_smart_cart(self):
-        timestamp = self.get_timestamp()
+        timestamp = self.__get_timestamp()
         url = f"https://www.jiomart.com/mst/rest/v1/5/cart/create/smart?n={timestamp}&universal=true"
         response = requests.get(
             url=url, cookies=self.cookies, headers=self.request_headers
