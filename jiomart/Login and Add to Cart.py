@@ -1,4 +1,4 @@
-import requests, time, sys, json
+import requests, time, sys, json, os
 
 
 class JioMart:
@@ -9,21 +9,27 @@ class JioMart:
         }
         self.cart_id = None
 
-    def fetch_cookies(self):
-        with open("cookies.txt", "r") as file:
-            data_dict = json.load(file)
-        cookies = {}
-        for cookie in data_dict:
-            cookies[cookie["name"]] = cookie["value"]
-        self.cookies = cookies
+    def load_cookies(self):
+        try:
+            with open("cookies.txt", "r") as file:
+                data_dict = json.load(file)
+            cookies = {}
+            for cookie in data_dict:
+                cookies[cookie["name"]] = cookie["value"]
+            self.cookies = cookies
+        except FileNotFoundError:
+            print("File cookies.txt doesn't exist to load cookies")
 
-    def fetch_headers(self):
-        with open("local_storage.txt", "r") as file:
-            data_dict = json.load(file)
-        headers = {}
-        headers["Authtoken"] = data_dict["authtoken"]
-        headers["Userid"] = data_dict["userid"]
-        self.add_request_headers(headers)
+    def load_headers(self):
+        try:
+            with open("local_storage.txt", "r") as file:
+                data_dict = json.load(file)
+            headers = {}
+            headers["Authtoken"] = data_dict["authtoken"]
+            headers["Userid"] = data_dict["userid"]
+            self.add_request_headers(headers)
+        except FileNotFoundError:
+            print("File load_storage.txt doesn't exist to load headers")
 
     def get_timestamp(self):
         return str(int(time.time()) * 1000)
