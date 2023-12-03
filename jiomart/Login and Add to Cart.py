@@ -1,14 +1,18 @@
 import requests, time, json
 
+
 class JioMart:
     def __init__(self) -> None:
         self.cookies = None
         self.request_headers = {
+            "Pin": "452010",
             "User-Agent": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
         }
         self.cart_id = None
+        self.__load_cookies()
+        self.__load_headers()
 
-    def load_cookies(self):
+    def __load_cookies(self):
         try:
             with open("cookies.txt", "r") as file:
                 data_dict = json.load(file)
@@ -19,7 +23,7 @@ class JioMart:
         except FileNotFoundError:
             print("File cookies.txt doesn't exist to load cookies")
 
-    def load_headers(self):
+    def __load_headers(self):
         try:
             with open("local_storage.txt", "r") as file:
                 data_dict = json.load(file)
@@ -50,24 +54,27 @@ class JioMart:
             self.__set_cart_id(response["result"]["cart_id"])
             return True
         else:
-            return False, response.text
+            return False, response
 
-    def add_to_cart(self, product_id):
+    def add_to_cart(self, product_id, seller_id=1):
         timestamp = self.__get_timestamp()
-        url = f"https://www.jiomart.com/mst/rest/v1/5/cart/add_item?product_code={product_id}&qty=1&seller_id=1&n={timestamp}&cart_id={self.cart_id}"
+
+        cart_url = f"https://www.jiomart.com/mst/rest/v1/5/cart/add_item?product_code={product_id}&qty=1&seller_id={seller_id}&n={timestamp}"
+
+        smart_cart_url = f"https://www.jiomart.com/mst/rest/v1/5/cart/add_item?product_code={product_id}&qty=1&seller_id=1&n={timestamp}&cart_id={self.cart_id}"
 
         response = requests.get(
-            url=url, cookies=self.cookies, headers=self.request_headers
+            url=smart_cart_url, cookies=self.cookies, headers=self.request_headers
         ).json()
 
         if response["status"] == "success":
             return True
         else:
-            return False, response.text
+            return False, response
 
     def get_cart_items(self):
         timestamp = self.__get_timestamp()
-        url = f"https://www.jiomart.com/mst/rest/v1/5/cart/get?n={timestamp}&cart_id={self.cart_id}"
+        url = f"https://www.jiomart.com/mst/rest/v1/5/cart/get?n={timestamp}"
 
         response = requests.get(
             url=url, cookies=self.cookies, headers=self.request_headers
@@ -75,4 +82,4 @@ class JioMart:
         if response["status"] == "success":
             return True, response["result"]["cart"]["lines"]
         else:
-            return False, response.text
+            return False, response
