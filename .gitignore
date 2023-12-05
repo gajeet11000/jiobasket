@@ -1,3 +1,5 @@
 .venv/
 jiomart/cookies.txt
 jiomart/local_storage.txt
+jiomart/cookies.json
+jiomart/local_storage.json
