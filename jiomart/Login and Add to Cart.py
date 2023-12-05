@@ -5,7 +5,8 @@ class JioMart:
     def __init__(self) -> None:
         self.cookies = None
         self.request_headers = {
-            "Pin": "452010",
+            "X-Application-Token": "qO2p_wQkq",
+            "X-Oms-Application-Id": "5ea6821b3425bb07c82a25c1",
             "User-Agent": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
         }
         self.cart_id = None
