@@ -12,6 +12,30 @@ class JioMart:
         self.cart_id = None
         self.__load_cookies()
         self.__load_headers()
+        self.change_location()
+
+    def set_header(self, key, value):
+        self.cookies[key] = value
+
+    def set_cookie(self, key, value):
+        self.request_headers[key] = value
+
+    def __get_location_details(self, pincode):
+        location_url = f"https://www.jiomart.com/mst/rest/v1/5/pin/{pincode}"
+        location_res = requests.get(
+            url=location_url, headers=self.request_headers
+        ).json()
+        return location_res["result"]
+
+    def change_location(self):
+        pincode = input("Enter your area pincode: ")
+        location_data = self.__get_location_details(pincode)
+
+        self.set_header("Pin", location_data["pin"])
+
+        self.set_cookie("nms_mgo_pincode", location_data["pin"])
+        self.set_cookie("nms_mgo_state_code", location_data["state_code"])
+        self.set_cookie("nms_mgo_city", location_data["pin"])
 
     def __load_cookies(self):
         try:
