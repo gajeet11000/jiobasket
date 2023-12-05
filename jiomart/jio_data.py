@@ -1,7 +1,115 @@
+import os
+import json
+import requests
+
+
 class JioData:
     def __init__(self) -> None:
-        self.headers = None
+        self.headers = {
+            "X-Application-Token": "qO2p_wQkq",
+            "X-Oms-Application-Id": "5ea6821b3425bb07c82a25c1",
+            "User-Agent": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
+        }
         self.cookies = None
         self.cart_id = None
         self.smart_cart_id = None
-        
+
+        self.__load_cookies()
+        self.__load_headers()
+        self.__check_cart_ids()
+        self.change_location()
+
+    def set_header(self, key, value):
+        self.cookies[key] = value
+
+    def set_cookie(self, key, value):
+        self.request_headers[key] = value
+
+    def __check_cart_ids(self):
+        if not self.cart_id:
+            self.__get_cart_id()
+        if not self.smart_cart_id:
+            self.__get_smart_cart_id()
+
+    def save_cookies_headers(self):
+        with open("cookies.json", "w") as json_file:
+            json.dump(self.cookies, json_file)
+
+        with open("headers.json", "w") as json_file:
+            json.dump(self.headers, json_file)
+
+    def __get_location_details(self, pincode):
+        location_url = f"https://www.jiomart.com/mst/rest/v1/5/pin/{pincode}"
+        location_res = requests.get(
+            url=location_url, headers=self.request_headers
+        ).json()
+        return location_res["result"]
+
+    def __get_cart_id(self):
+        url = "https://www.jiomart.com/mst/rest/v1/5/cart/get"
+        res = requests.get(url=url, headers=self.headers, cookies=self.cookies).json()
+
+        if res["status"] == "success":
+            self.cart_id = res["result"]["cart"]["id"]
+        else:
+            print("Failed to get regular cart id")
+
+    def __get_smart_cart_id(self):
+        url = "https://www.jiomart.com/mst/rest/v1/5/cart/get/smart_cart_id"
+        res = requests.get(url=url, headers=self.headers, cookies=self.cookies).json()
+
+        if res["status"] == "success":
+            self.smart_cart_id = res["result"]["cart_id"]
+        else:
+            print("Failed to get smart cart id")
+
+    def change_location(self):
+        pincode = input("Enter your area pincode: ")
+        location_data = self.__get_location_details(pincode)
+
+        self.set_header("Pin", location_data["pin"])
+
+        self.set_cookie("nms_mgo_pincode", location_data["pin"])
+        self.set_cookie("nms_mgo_state_code", location_data["state_code"])
+        self.set_cookie("nms_mgo_city", location_data["pin"])
+
+        self.save_cookies_headers()
+
+    def __load_cookies(self):
+        if os.path.exists("cookies.json") and os.path.getsize() != 0:
+            with open("cookies.json") as json_file:
+                self.cookies.update(json.load(json_file))
+        else:
+            try:
+                with open("cookies.txt", "r") as file:
+                    data_dict = json.load(file)
+                cookies = {}
+                for cookie in data_dict:
+                    cookies[cookie["name"]] = cookie["value"]
+                self.cookies = cookies
+            except FileNotFoundError:
+                print("File cookies.txt doesn't exist to load cookies")
+
+    def __load_headers(self):
+        if os.path.exists("headers.json") and os.path.getsize() != 0:
+            with open("headers.json") as json_file:
+                self.headers.update(json.load(json_file))
+        else:
+            try:
+                with open("local_storage.txt", "r") as file:
+                    data_dict = json.load(file)
+                headers = {}
+                headers["Authtoken"] = data_dict["authtoken"]
+                headers["Userid"] = data_dict["userid"]
+                self.headers.update(headers)
+
+                cart_info = data_dict.get("cart_info")
+                if cart_info:
+                    self.cart_id = cart_info["cart"]["id"]
+
+                smart_cart_info = data_dict.get("smart_cart_info")
+                if smart_cart_info:
+                    self.smart_cart_id = smart_cart_info["cart"]["id"]
+
+            except FileNotFoundError:
+                print("File load_storage.txt doesn't exist to load headers")
