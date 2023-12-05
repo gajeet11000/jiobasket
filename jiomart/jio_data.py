@@ -19,10 +19,10 @@ class JioData:
         self.__check_cart_ids()
         self.change_location()
 
-    def set_header(self, key, value):
+    def __set_header(self, key, value):
         self.cookies[key] = value
 
-    def set_cookie(self, key, value):
+    def __set_cookie(self, key, value):
         self.request_headers[key] = value
 
     def __check_cart_ids(self):
@@ -67,11 +67,11 @@ class JioData:
         pincode = input("Enter your area pincode: ")
         location_data = self.__get_location_details(pincode)
 
-        self.set_header("Pin", location_data["pin"])
+        self.__set_header("Pin", location_data["pin"])
 
-        self.set_cookie("nms_mgo_pincode", location_data["pin"])
-        self.set_cookie("nms_mgo_state_code", location_data["state_code"])
-        self.set_cookie("nms_mgo_city", location_data["pin"])
+        self.__set_cookie("nms_mgo_pincode", location_data["pin"])
+        self.__set_cookie("nms_mgo_state_code", location_data["state_code"])
+        self.__set_cookie("nms_mgo_city", location_data["pin"])
 
         self.save_cookies_headers()
 
