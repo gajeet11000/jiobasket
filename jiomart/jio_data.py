@@ -51,6 +51,18 @@ class JioData:
         location_res = requests.get(url=location_url, headers=self.headers).json()
         return location_res["result"]
 
+    def delete_session(self):
+        try:
+            os.remove("cookies.json")
+            print("Saved cookies.json is deleted.")
+        except FileNotFoundError:
+            print("cookies.json not found to delete")
+        try:
+            os.remove("headers.json")
+            print("Saved headers.json is deleted.")
+        except FileNotFoundError:
+            print("headers.json not found to delete")
+
     def __get_cart_id(self):
         timestamp = self.get_timestamp()
         url = f"https://www.jiomart.com/mst/rest/v1/5/cart/get?n={timestamp}"
