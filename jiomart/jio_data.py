@@ -48,7 +48,13 @@ class JioData:
 
     def __get_location_details(self, pincode):
         location_url = f"https://www.jiomart.com/mst/rest/v1/5/pin/{pincode}"
-        location_res = requests.get(url=location_url, headers=self.headers).json()
+        location_res = requests.get(url=location_url, headers=self.headers)
+        try:
+            location_res = location_res.json()
+        except json.JSONDecodeError:
+            print(location_res.text)
+            raise
+
         return location_res["result"]
 
     def delete_session(self):
@@ -68,8 +74,12 @@ class JioData:
     def __get_cart_id(self):
         timestamp = self.get_timestamp()
         url = f"https://www.jiomart.com/mst/rest/v1/5/cart/get?n={timestamp}"
-        res = requests.get(url=url, headers=self.headers, cookies=self.cookies).json()
-        print(res)
+        res = requests.get(url=url, headers=self.headers, cookies=self.cookies)
+        try:
+            res = res.json()
+        except json.JSONDecodeError:
+            print(res.text)
+            raise
 
         if res["status"] == "success":
             self.cart_id = res["result"]["cart"]["id"]
@@ -78,7 +88,12 @@ class JioData:
 
     def __get_smart_cart_id(self):
         url = "https://www.jiomart.com/mst/rest/v1/5/cart/get/smart_cart_id"
-        res = requests.get(url=url, headers=self.headers, cookies=self.cookies).json()
+        res = requests.get(url=url, headers=self.headers, cookies=self.cookies)
+        try:
+            res = res.json()
+        except json.JSONDecodeError:
+            print(res.text)
+            raise
 
         if res["status"] == "success":
             self.smart_cart_id = res["result"]["cart_id"]
