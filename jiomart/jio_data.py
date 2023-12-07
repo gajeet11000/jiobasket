@@ -15,14 +15,14 @@ class JioData:
     smart_cart_id = None
 
     def __init__(self) -> None:
-        if self.is_super_instantiated():
+        if self.is_super_not_instantiated():
             self.__load_cookies()
             self.__load_headers()
 
             self.__check_cart_ids()
             self.change_location()
 
-    def is_super_instantiated(self):
+    def is_super_not_instantiated(self):
         return (
             self.headers
             == {
