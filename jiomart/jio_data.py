@@ -57,11 +57,13 @@ class JioData:
             print("Saved cookies.json is deleted.")
         except FileNotFoundError:
             print("cookies.json not found to delete")
+            raise
         try:
             os.remove("headers.json")
             print("Saved headers.json is deleted.")
         except FileNotFoundError:
             print("headers.json not found to delete")
+            raise
 
     def __get_cart_id(self):
         timestamp = self.get_timestamp()
@@ -109,6 +111,7 @@ class JioData:
                 self.cookies.update(cookies)
             except FileNotFoundError:
                 print("File cookies.txt doesn't exist to load cookies")
+                raise
 
     def __load_headers(self):
         if os.path.exists("headers.json") and os.path.getsize("headers.json") != 0:
@@ -134,3 +137,4 @@ class JioData:
 
             except FileNotFoundError:
                 print("File load_storage.txt doesn't exist to load headers")
+                raise
