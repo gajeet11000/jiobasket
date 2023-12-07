@@ -18,9 +18,6 @@ class JioData:
         self.__load_cookies()
         self.__load_headers()
 
-        print(self.cookies)
-        print(self.headers)
-
         self.__check_cart_ids()
         self.change_location()
 
