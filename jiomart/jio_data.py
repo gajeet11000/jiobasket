@@ -44,6 +44,9 @@ class JioData:
     def __set_header(self, key, value):
         self.headers[key] = value
 
+    def __set_smart_cart_id(self, new_cart_id):
+        self.smart_cart_id = new_cart_id
+
     def __check_cart_ids(self):
         if not self.cart_id:
             self.__get_cart_id()
@@ -122,6 +125,22 @@ class JioData:
         self.__set_cookie("nms_mgo_city", location_data["pin"])
 
         self.save_cookies_headers()
+
+    def create_new_smart_cart(self):
+        timestamp = self.get_timestamp()
+        url = f"https://www.jiomart.com/mst/rest/v1/5/cart/create/smart?n={timestamp}&universal=true"
+        res = requests.get(url=url, cookies=self.cookies, headers=self.request_headers)
+        try:
+            res = res.json()
+        except json.JSONDecodeError:
+            print(res.text)
+            raise
+
+        if res["status"] == "success":
+            self.__set_smart_cart_id(res["result"]["cart_id"])
+            return True
+        else:
+            return False, res
 
     def __load_cookies(self):
         if os.path.exists("cookies.json") and os.path.getsize("cookies.json") != 0:
