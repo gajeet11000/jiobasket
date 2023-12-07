@@ -5,21 +5,35 @@ import requests
 
 
 class JioData:
+    headers = {
+        "X-Application-Token": "qO2p_wQkq",
+        "X-Oms-Application-Id": "5ea6821b3425bb07c82a25c1",
+        "User-Agent": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
+    }
+    cookies = {}
+    cart_id = None
+    smart_cart_id = None
+
     def __init__(self) -> None:
-        self.headers = {
-            "X-Application-Token": "qO2p_wQkq",
-            "X-Oms-Application-Id": "5ea6821b3425bb07c82a25c1",
-            "User-Agent": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
-        }
-        self.cookies = {}
-        self.cart_id = None
-        self.smart_cart_id = None
+        if self.is_super_instantiated():
+            self.__load_cookies()
+            self.__load_headers()
 
-        self.__load_cookies()
-        self.__load_headers()
+            self.__check_cart_ids()
+            self.change_location()
 
-        self.__check_cart_ids()
-        self.change_location()
+    def is_super_instantiated(self):
+        return (
+            self.headers
+            == {
+                "X-Application-Token": "qO2p_wQkq",
+                "X-Oms-Application-Id": "5ea6821b3425bb07c82a25c1",
+                "User-Agent": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
+            }
+            and self.cookies == {}
+            and not self.cart_id
+            and not self.smart_cart_id
+        )
 
     def get_timestamp(self):
         return str(int(time.time()) * 1000)
