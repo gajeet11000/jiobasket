@@ -35,6 +35,14 @@ class JioData:
             and not self.smart_cart_id
         )
 
+    def get_cart_id_by_type(self, cart_type):
+        if cart_type == "regular":
+            return self.cart_id
+        elif cart_type == "smart":
+            return self.smart_cart_id
+        else:
+            raise Exception("Invalid cart type exception!")
+
     def get_timestamp(self):
         return str(int(time.time()) * 1000)
 
