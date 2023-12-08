@@ -74,3 +74,14 @@ class JioMart(JioData):
             return True
         else:
             return False, res
+
+    def clear_cart(self, cart_type):
+        cart_items = self.get_cart_items(cart_type)
+        if cart_items[0]:
+            if cart_items[1]:
+                for item in cart_items[1]:
+                    self.remove_from_cart(cart_type, item["product_code"], item["qty"])
+            else:
+                print("Your cart is already empty, nothing to clear.")
+        else:
+            print(f"Error occured fetching {cart_type} cart details to clear items")
