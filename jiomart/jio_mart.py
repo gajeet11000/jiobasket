@@ -8,9 +8,14 @@ class JioMart(JioData):
     def __init__(self) -> None:
         super().__init__()
 
-    def get_cart_items(self, cart_id):
+    def get_cart_items(self, cart_type):
         timestamp = self.get_timestamp()
-        url = f"https://www.jiomart.com/mst/rest/v1/5/cart/get?n={timestamp}&cart_id={cart_id}"
+        url = f"https://www.jiomart.com/mst/rest/v1/5/cart/get?n={timestamp}&cart_id="
+
+        try:
+            url += str(self.get_cart_id_by_type(cart_type))
+        except Exception:
+            print("Invalid cart type. Please check for your input cart type")
 
         res = requests.get(url=url, cookies=self.cookies, headers=self.request_headers)
 
@@ -30,10 +35,10 @@ class JioMart(JioData):
 
         url = f"https://www.jiomart.com/mst/rest/v1/5/cart/add_item?product_code={product_id}&qty={qty}&seller_id={seller_id}&n={timestamp}&cart_id="
 
-        if cart_type == "regular":
-            url += str(self.cart_id)
-        else:
-            url += str(self.smart_cart_id)
+        try:
+            url += str(self.get_cart_id_by_type(cart_type))
+        except Exception:
+            print("Invalid cart type. Please check for your input cart type")
 
         res = requests.get(url=url, cookies=self.cookies, headers=self.request_headers)
 
@@ -52,10 +57,10 @@ class JioMart(JioData):
         timestamp = self.get_timestamp()
         url = f"https://www.jiomart.com/mst/rest/v1/5/cart/remove_item?product_code={product_id}&qty={qty}&n={timestamp}&cart_id="
 
-        if cart_type == "regular":
-            url += str(self.cart_id)
-        else:
-            url += str(self.smart_cart_id)
+        try:
+            url += str(self.get_cart_id_by_type(cart_type))
+        except Exception:
+            print("Invalid cart type. Please check for your input cart type")
 
         res = requests.get(url=url, cookies=self.cookies, headers=self.request_headers)
 
