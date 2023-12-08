@@ -17,7 +17,7 @@ class JioMart(JioData):
         except Exception:
             print("Invalid cart type. Please check for your input cart type")
 
-        res = requests.get(url=url, cookies=self.cookies, headers=self.request_headers)
+        res = requests.get(url=url, cookies=self.cookies, headers=self.headers)
 
         try:
             res = res.json()
@@ -40,7 +40,7 @@ class JioMart(JioData):
         except Exception:
             print("Invalid cart type. Please check for your input cart type")
 
-        res = requests.get(url=url, cookies=self.cookies, headers=self.request_headers)
+        res = requests.get(url=url, cookies=self.cookies, headers=self.headers)
 
         try:
             res = res.json()
@@ -62,7 +62,7 @@ class JioMart(JioData):
         except Exception:
             print("Invalid cart type. Please check for your input cart type")
 
-        res = requests.get(url=url, cookies=self.cookies, headers=self.request_headers)
+        res = requests.get(url=url, cookies=self.cookies, headers=self.headers)
 
         try:
             res = res.json()
