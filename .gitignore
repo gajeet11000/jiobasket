@@ -5,3 +5,4 @@ jiomart/local_storage.txt
 jiomart/cookies.json
 jiomart/headers.json
 Test.py
+db.sqlite3
