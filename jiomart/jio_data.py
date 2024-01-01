@@ -83,7 +83,7 @@ class JioData:
         with open("headers.json", "w") as json_file:
             json.dump(self.headers, json_file)
 
-    def __get_location_details(self, pincode):
+    def get_location_details(self, pincode):
         location_url = f"https://www.jiomart.com/mst/rest/v1/5/pin/{pincode}"
         location_res = requests.get(url=location_url, headers=self.headers)
         try:
@@ -93,6 +93,21 @@ class JioData:
             raise
 
         return location_res["result"]
+
+    def get_customer_details(self):
+        url = "https://www.jiomart.com/mst/rest/v1/entity/customer/get_details"
+        res = requests.get(url=url, headers=self.headers)
+
+        try:
+            res = res.json()
+        except json.JSONDecodeError:
+            print(res.text)
+            raise
+
+        if res["status"] == "success":
+            return True, res["result"]["your_details"]
+        else:
+            return False, res.text
 
     def delete_session(self):
         try:
