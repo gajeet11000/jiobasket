@@ -62,7 +62,7 @@ class JioData:
         if not self.smart_cart_id:
             self.__get_smart_cart_id()
 
-    def get_UUID():
+    def get_UUID(self):
         uuid_pattern = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"
 
         def generate_char(c):
