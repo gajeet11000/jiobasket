@@ -145,7 +145,7 @@ class JioData:
 
         self.__set_cookie("nms_mgo_pincode", location_data["pin"])
         self.__set_cookie("nms_mgo_state_code", location_data["state_code"])
-        self.__set_cookie("nms_mgo_city", location_data["pin"])
+        self.__set_cookie("nms_mgo_city", location_data["city"])
 
         self.save_cookies_headers()
 
