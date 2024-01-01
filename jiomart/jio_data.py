@@ -1,6 +1,7 @@
 import os
 import time
 import json
+import random
 import requests
 
 
@@ -60,6 +61,20 @@ class JioData:
             self.__get_cart_id()
         if not self.smart_cart_id:
             self.__get_smart_cart_id()
+
+    def get_UUID():
+        uuid_pattern = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"
+
+        def generate_char(c):
+            if c == "x":
+                return format(int(random.random() * 16), "x")
+            elif c == "y":
+                return format((3 & int(random.random() * 16)) | 8, "x")
+            else:
+                return c
+
+        uuid_result = "".join(generate_char(c) for c in uuid_pattern)
+        return uuid_result
 
     def save_cookies_headers(self):
         with open("cookies.json", "w") as json_file:
