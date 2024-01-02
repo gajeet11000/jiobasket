@@ -39,7 +39,7 @@ class Database(JioData):
             # Scraping the product details from the response
             product_detail["id"] = data["gtm_details"]["id"]
             product_detail["name"] = data["gtm_details"]["name"]
-            product_detail["price"] = data["gtm_details"]["price"]
+            product_detail["price"] = float(data["gtm_details"]["price"])
             product_detail["brand"] = data["gtm_details"]["brand"]
 
             product_detail["max_qty"] = data["max_qty_in_order"]
@@ -141,5 +141,6 @@ class Database(JioData):
                 )
         else:
             print("Failed to get details for product with id:", product_id)
+            return False, None
 
-        return product_detail
+        return True, product_detail
