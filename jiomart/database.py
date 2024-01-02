@@ -108,7 +108,9 @@ class Database(JioData):
                 )
 
                 url = "https://www.jiomart.com/platform/logistics/api/v1/promise"
-                res = requests.post(url=url, cookies=self.cookies, headers=self.headers)
+                res = requests.post(
+                    url=url, cookies=self.cookies, headers=self.headers, json=data_dict
+                )
 
                 try:
                     res = res.json()
@@ -116,10 +118,10 @@ class Database(JioData):
                     print(res.text)
                     raise
 
-                errors = res["articles"]["error"]
+                errors = res["articles"][0]["error"]
 
                 if errors["type"] == None:
-                    return True, res["articles"]["seller_data"]["sellerid"]
+                    return True, res["articles"][0]["seller_data"][0]["sellerid"]
                 else:
                     return False, res
 
