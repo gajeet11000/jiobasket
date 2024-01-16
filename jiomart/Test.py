@@ -1,4 +1,4 @@
-import json, requests, random
+import json, requests, random, re
 
 url = "https://www.jiomart.com/catalog/productdetails/get/590860406"
 
@@ -58,6 +58,20 @@ def get_customer_details():
         return False, res.text
 
 
+def extract_weight_unit(product_name):
+    pattern = r"Approx (\d+)\s*(g|kg|grams|gm|ml|l)?\s*-\s*(\d+)\s*(g|kg|grams|gm|ml|l)?|(\d+)\s*(g|kg|grams|gm|ml|l)"
+    matches = re.search(pattern, product_name, re.IGNORECASE)
+
+    if matches:
+        weight = matches.group(1) or matches.group(5)
+        unit = matches.group(2) or matches.group(6)
+        return (
+            float(weight),
+            unit.lower() if unit else None,
+        )
+    return None
+
+
 def get_product_details(product_id):
     product_url = __base_url + product_id
 
@@ -80,6 +94,14 @@ def get_product_details(product_id):
         product_detail["brand"] = data["gtm_details"]["brand"]
 
         product_detail["max_qty"] = data["max_qty_in_order"]
+
+        weight_unit = extract_weight_unit(product_detail["name"])
+
+        if weight_unit:
+            product_detail["weight"] = weight_unit[0]
+            product_detail["unit"] = weight_unit[1]
+        else:
+            product_detail["weight"] = product_detail["unit"] = None
 
         # Fetching required payload for getting seller_id and availability
         l_idx = data["image_url"].rfind("/")
@@ -159,6 +181,14 @@ def get_product_details(product_id):
         seller_details = get_additional_details(
             article_id, vertical, tenant_ids, mobile_no
         )
+        if seller_details[0]:
+            product_detail["availability"] = True
+            product_detail["seller_id"] = seller_details[1]
+
+            if product_detail["seller_id"] == "1":
+                product_detail["cart_category"] = "smart"
+            else:
+                product_detail["cart_category"] = "normal"
 
         if seller_details[0]:
             product_detail["availability"] = True
@@ -176,31 +206,7 @@ def get_product_details(product_id):
     return product_detail
 
 
-# print(get_product_details("490876695"))
-import re
-
-
-def extract_weight_unit(product_name):
-    # Regular expression pattern to match weight and unit information (case-insensitive)
-    pattern = r"Approx (\d+)\s*(g|kg|grams|gm|ml|l)?\s*-\s*(\d+)\s*(g|kg|grams|gm|ml|l)?|(\d+)\s*(g|kg|grams|gm|ml|l)"
-
-    # Find matches in the product name
-    matches = re.search(pattern, product_name, re.IGNORECASE)
-
-    if matches:
-        # Extract lower bound of the approximate weight or the exact weight
-        weight = matches.group(1) or matches.group(5)
-
-        # Extract unit information
-        unit = matches.group(2) or matches.group(6)
-
-        return (
-            float(weight),
-            unit.lower() if unit else "g",
-        )  # Convert unit to lowercase for consistency
-
-    return None
-
+print(get_product_details("604786225"))
 
 # Sample data
 product_names = [
