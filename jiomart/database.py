@@ -1,3 +1,4 @@
+import re
 import os
 import csv
 import json
@@ -41,8 +42,30 @@ class Database(JioData):
             product_detail["name"] = data["gtm_details"]["name"]
             product_detail["price"] = float(data["gtm_details"]["price"])
             product_detail["brand"] = data["gtm_details"]["brand"]
+            product_detail["generic_name"] = ""
 
             product_detail["max_qty"] = data["max_qty_in_order"]
+
+            def extract_weight_unit(product_name):
+                pattern = r"Approx (\d+)\s*(g|kg|grams|gm|ml|l)?\s*-\s*(\d+)\s*(g|kg|grams|gm|ml|l)?|(\d+)\s*(g|kg|grams|gm|ml|l)"
+                matches = re.search(pattern, product_name, re.IGNORECASE)
+
+                if matches:
+                    weight = matches.group(1) or matches.group(5)
+                    unit = matches.group(2) or matches.group(6)
+                    return (
+                        float(weight),
+                        unit.lower() if unit else None,
+                    )
+                return None
+
+            weight_unit = extract_weight_unit(product_detail["name"])
+
+            if weight_unit:
+                product_detail["weight"] = weight_unit[0]
+                product_detail["unit"] = weight_unit[1]
+            else:
+                product_detail["weight"] = product_detail["unit"] = None
 
             # Fetching required payload for getting seller_id and availability
             l_idx = data["image_url"].rfind("/")
@@ -132,6 +155,12 @@ class Database(JioData):
             if seller_details[0]:
                 product_detail["availability"] = True
                 product_detail["seller_id"] = seller_details[1]
+
+                if product_detail["seller_id"] == "1":
+                    product_detail["cart_category"] = "smart"
+                else:
+                    product_detail["cart_category"] = "normal"
+
             else:
                 print(
                     "Product with id : ",
@@ -144,3 +173,24 @@ class Database(JioData):
             return False, None
 
         return True, product_detail
+
+    def refresh_databse(self):
+        with open("product_list.csv", "r") as product_list:
+            csv_reader = csv.DictReader(product_list)
+
+        for product in csv_reader:
+            product_detail = self.get_product_details(product["id"])
+            new_product = Product(
+                id=product_detail["id"],
+                name=product_detail["name"],
+                brand=product_detail["brand"],
+                weight_value=product_detail["weight"],
+                weight_unit=product_detail["unit"],
+                price=product_detail["price"],
+                max_qty=product_detail["max_qty"],
+                seller_id=product_detail["seller_id"],
+                generic_name=product_detail["generic_name"],
+                cart_category=product_detail["cart_category"],
+                available=product_detail["availability"],
+            )
+            new_product.save()
