@@ -20,7 +20,6 @@ class Database(JioData):
         django.setup()
 
         self.__base_url = "https://www.jiomart.com/catalog/productdetails/get/"
-        self.__products = {}
 
     def get_product_details(self, product_id):
         product_url = self.__base_url + product_id
